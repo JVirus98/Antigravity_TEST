@@ -1,0 +1,10 @@
+# 프로젝트 의존성 패키지 목록
+# Windows 환경 전용 (Outlook COM 인터페이스 사용)
+#
+# 설치 방법:
+#   pip install -r requirements.txt
+#
+# 주의: pywin32는 Windows 전용이며 Outlook이 설치된 환경에서만 정상 동작합니다.
+
+pywin32>=306
+mcp>=1.0.0          # MCP 서버 SDK (mcp/server.py)
