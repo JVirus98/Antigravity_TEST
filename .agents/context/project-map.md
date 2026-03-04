@@ -1,6 +1,6 @@
 ﻿# 🗺 Antigravity Project Map
-> **마지막 업데이트**: 2026-03-04  
-> **업데이트 내용**: context 파일 4개→2개 통합 (daily-report-guide.md, weekly-report-guide.md)
+> **마지막 업데이트**: 2026-03-05  
+> **업데이트 내용**: 파일 경로 오류 수정 (scripts/ 폴더, output/ 폴더 경로 반영, outlook_mcp/ 구조 추가)
 
 ---
 
@@ -19,23 +19,32 @@
 c:\TEST\dailyreport\
 │
 ├── AG_RULES.md                  # Antigravity 에이전트 규칙 (최우선 로드)
-│
 ├── requirements.txt             # 의존성 패키지 목록 (pywin32>=306)
-├── outlook_utils.py             # ★ 공통 유틸리티 모듈 (strip_html, get_body, connect_outlook 등)
-├── save_all_reports.py          # ★ 핵심 스크립트 - 반기별 보고서 관리
-├── check_my_report.py           # 특정 날 내 일일보고 확인 (--date 인자 지원)
-├── get_today_sent.py            # 오늘 보낸 메일 조회 → today_sent.md (--date 인자 지원)
-├── get_sent_emails.py           # 보낸 메일 일반 조회 (argparse 지원, 터미널 출력)
 ├── daily_update.bat             # ★ 매일 퇴근 후 1회 실행 자동화 배치
 │
-├── today_sent.md                # 오늘 발송 메일 조회 결과 (일일보고 작성용)
-├── output/                      # AI 일일보고 초안 저장 폴더
-│   └── daily_report_draft.txt  # ★ AI 작성 일일보고 초안 (단일 파일, 항상 덮어씀)
+├── scripts/                     # Python 스크립트 모음
+│   ├── outlook_utils.py         # ★ 공통 유틸리티 모듈 (strip_html, get_body, connect_outlook 등)
+│   ├── save_all_reports.py      # ★ 핵심 스크립트 - 반기별 보고서 관리
+│   ├── check_my_report.py       # 특정 날 내 일일보고 확인 (--date 인자 지원)
+│   ├── get_today_sent.py        # 오늘 보낸 메일 조회 → output/today_sent.md (--date 인자 지원)
+│   └── get_sent_emails.py       # 보낸 메일 일반 조회 (argparse 지원, 터미널 출력)
+│
+├── outlook_mcp/                 # MCP 서버 (Antigravity 직접 호출용)
+│   ├── server.py                # ★ MCP 서버 메인 진입점 (8개 tool)
+│   ├── tools/
+│   │   ├── outlook.py           # Outlook 메일 조회 3개 tool
+│   │   └── reports.py           # 보고서 저장/읽기 5개 tool
+│   └── README.md                # 연결 설정 방법 가이드
+│
+├── output/                      # 생성 파일 저장 폴더 (.gitignore 제외)
+│   ├── today_sent.md            # 오늘 발송 메일 조회 결과 (일일보고 작성용)
+│   ├── daily_report_draft.txt   # ★ AI 작성 일일보고 초안 (단일 파일, 항상 덮어씀)
+│   └── weekly_report_YYYY-WNN.md # 주간보고 출력 파일
 │
 ├── reports/                     # 반기별 일일보고 아카이브 (RAG 학습용)
-│   ├── 2025_H1.md              # 2025 상반기 (1~6월) - 86건 - 완결
-│   ├── 2025_H2.md              # 2025 하반기 (7~12월) - 97건 - 완결
-│   ├── 2026_H1.md              # 2026 상반기 (1~6월) - 28건 - 진행중 ◀ 여기만 업데이트
+│   ├── 2025_H1.md              # 2025 상반기 (1~6월) - 완결
+│   ├── 2025_H2.md              # 2025 하반기 (7~12월) - 완결
+│   ├── 2026_H1.md              # 2026 상반기 (1~6월) - 진행중 ◀ 여기만 업데이트
 │   └── _index.md               # 반기별 목록 인덱스
 │
 └── .agents/
@@ -76,17 +85,17 @@ outlook_mcp/
 
 ## �📄 핵심 스크립트 설명
 
-### ★ `save_all_reports.py` - 반기별 보고서 관리 (메인 워크플로우)
+### ★ `scripts/save_all_reports.py` - 반기별 보고서 관리 (메인 워크플로우)
 
 ```powershell
 # 매일 퇴근 후 실행 → 2026_H1.md에 새 날짜 자동 추가 (증분)
-python save_all_reports.py
+python scripts/save_all_reports.py
 
 # 포맷 변경 시 현재 반기 전체 재생성
-python save_all_reports.py --force
+python scripts/save_all_reports.py --force
 
 # (최초 1회만) 날짜별 MD → 반기별 MD 마이그레이션
-python save_all_reports.py --init
+python scripts/save_all_reports.py --init
 ```
 
 **동작 원리**:
@@ -101,23 +110,25 @@ python save_all_reports.py --init
 
 ---
 
-### `check_my_report.py` - 특정 날 보고서 확인
+### `scripts/check_my_report.py` - 특정 날 보고서 확인
 
-Outlook 전체 폴더 + 즐겨찾기에서 본인 일일보고 검색 후 `my_daily_report.txt`로 저장.
+Outlook 전체 폴더 + 즐겨찾기에서 본인 일일보고 검색 후 `output/my_daily_report.txt`로 저장.
 
 ```powershell
-python check_my_report.py   # TARGET_DATE 변수 수동 수정 필요
+python scripts/check_my_report.py           # 기본값: 어제 날짜
+python scripts/check_my_report.py --date 2026-03-04  # 날짜 지정
 ```
 
 ---
 
-### `get_today_sent.py` - 오늘 보낸 메일 조회
+### `scripts/get_today_sent.py` - 오늘 보낸 메일 조회
 
-즐겨찾기 보낸편지함 우선 탐색 → `today_sent.md` 저장.  
+즐겨찾기 보낸편지함 우선 탐색 → `output/today_sent.md` 저장.  
 **일일보고 작성 전에 실행**하면 오늘 업무 내역 자동 정리.
 
 ```powershell
-python get_today_sent.py
+python scripts/get_today_sent.py
+python scripts/get_today_sent.py --date 2026-03-04  # 날짜 지정
 ```
 
 ---
