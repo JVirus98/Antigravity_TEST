@@ -1,6 +1,6 @@
 ﻿# 🗺 Antigravity Project Map
 > **마지막 업데이트**: 2026-03-05  
-> **업데이트 내용**: 파일 경로 오류 수정 (scripts/ 폴더, output/ 폴더 경로 반영, outlook_mcp/ 구조 추가)
+> **업데이트 내용**: notebooklm_mcp 서버 구조 추가 (ON/OFF 전환, 보고서 연동, 비교 기능)
 
 ---
 
@@ -29,12 +29,21 @@ c:\TEST\dailyreport\
 │   ├── get_today_sent.py        # 오늘 보낸 메일 조회 → output/today_sent.md (--date 인자 지원)
 │   └── get_sent_emails.py       # 보낸 메일 일반 조회 (argparse 지원, 터미널 출력)
 │
-├── outlook_mcp/                 # MCP 서버 (Antigravity 직접 호출용)
+├── outlook_mcp/                 # MCP 서버 - Outlook 메일 연동
 │   ├── server.py                # ★ MCP 서버 메인 진입점 (8개 tool)
 │   ├── tools/
 │   │   ├── outlook.py           # Outlook 메일 조회 3개 tool
 │   │   └── reports.py           # 보고서 저장/읽기 5개 tool
 │   └── README.md                # 연결 설정 방법 가이드
+│
+├── notebooklm_mcp/              # MCP 서버 - NotebookLM ON/OFF 전환 연동
+│   ├── PLAN.md                  # 개발 계획 문서
+│   ├── README.md                # 연결 설정 및 사용법 가이드
+│   ├── server.py                # ★ MCP 서버 메인 진입점 (5개 tool)
+│   ├── mode.config.json         # ON/OFF 상태 저장 (.gitignore 제외)
+│   └── tools/
+│       ├── mode.py              # get_mode, set_mode tool
+│       └── notebooklm.py        # upload_reports, query_notebooklm, compare_modes tool
 │
 ├── output/                      # 생성 파일 저장 폴더 (.gitignore 제외)
 │   ├── today_sent.md            # 오늘 발송 메일 조회 결과 (일일보고 작성용)
@@ -253,6 +262,9 @@ reports/2026_H1.md 업로드 후 질의응답
 - [x] **setup.md 현행화** (신규 기능 및 파일 구조 반영 - 2026-02-27)
 - [x] **context 파일 4개→2개 통합** (daily-report-guide.md, weekly-report-guide.md - 2026-03-04)
 - [x] **outlook_mcp MCP 서버 구축** (8개 tool - 2026-03-04)
+- [x] **notebooklm_mcp MCP 서버 구조 구축** (5개 tool, ON/OFF 전환 - 2026-03-05)
+- [ ] **notebooklm-mcp npx 설치 + Google 인증** (MODE ON 활성화)
+- [ ] **AG_RULES.md에 notebooklm MCP 서버 등록**
 - [ ] 일일보고 자동 작성 보조 기능 개발 (`/ag-design` → `/ag-impl`)
 - [ ] CRM 업로드 자동화 연구
 - [ ] Windows 작업 스케줄러 등록 (daily_update.bat 매일 18:00 자동 실행)
