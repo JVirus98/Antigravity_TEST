@@ -21,6 +21,9 @@ output/
 .env
 *.secret
 
+# NotebookLM MCP - notebook URL 등 민감 정보 포함 가능
+notebooklm_mcp/mode.config.json
+
 # OS
 .DS_Store
 Thumbs.db
